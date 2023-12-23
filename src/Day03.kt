@@ -82,5 +82,73 @@ fun getNumberIfHasAdjacentSymbol(input: List<String>, number: Number): Int {
 
 
 fun getGearProduct(input: List<String>, asterisk: AsteriskPosition): Int {
+    var rangeToCheck = asterisk.position - 1..asterisk.position +1
+    val adjascentNumbers = mutableListOf<Int>()
+
+    // Check if line above contains number
+    val lineAbove = input[asterisk.line - 1]
+    for (i in rangeToCheck) {
+        if (lineAbove[i].isDigit()) {
+            adjascentNumbers.add(getFullNumber(lineAbove, i))
+            break
+        }
+    }
+
+    // Check if line after contains number
+    val lineAfter = input[asterisk.line + 1]
+    for (i in rangeToCheck) {
+        if (lineAfter[i].isDigit()) {
+            adjascentNumbers.add(getFullNumber(lineAfter, i))
+        }
+    }
+
+    val line = input[asterisk.line]
+    // Check if char before or after contains number
+    val positionBefore = asterisk.position-1
+    if (line[positionBefore].isDigit()) {
+        adjascentNumbers.add(getFullNumber(line, positionBefore))
+    }
+    val positionAfter = asterisk.position+1
+    if (line[positionAfter].isDigit()) {
+        adjascentNumbers.add(getFullNumber(line, positionAfter))
+    }
+
+    // As a gear consists of exactly two numbers, no less, no more, we check for that
+    val distinct = adjascentNumbers.distinct()
+    if (distinct.size == 2) {
+        return adjascentNumbers[0] * adjascentNumbers[1]
+    }
+
     return 0
+}
+
+fun getFullNumber(line: String, position: Int): Int {
+    val digits = mutableListOf(line[position])
+    var currentPosition = position
+    while (true) {
+        if (currentPosition == 0) {
+            break
+        }
+        val prev = line[currentPosition-1]
+        if (prev.isDigit()) {
+            digits.add(0, prev)
+            currentPosition -= 1
+            continue
+        }
+        break
+    }
+    currentPosition = position
+    while (true) {
+        if (currentPosition == 139) {
+            break
+        }
+        val next = line[currentPosition+1]
+        if (next.isDigit()) {
+            digits.add( next)
+            currentPosition += 1
+            continue
+        }
+        break
+    }
+    return digits.joinToString("").toInt()
 }
